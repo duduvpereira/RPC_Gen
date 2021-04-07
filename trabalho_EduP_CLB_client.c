@@ -143,7 +143,7 @@ main (int argc, char *argv[])
 	infos *rec = (infos *) malloc(sizeof(infos));
 	
 
-	if (argc!=6) {
+	/*if (argc!=6) {
     fprintf(stderr,"Uso correto: %s perfil operação Valor1 numConta\n",argv[0]);
     printf("argc=>%d\n",argc);
     printf("Perfil:\n");
@@ -159,34 +159,101 @@ main (int argc, char *argv[])
     printf("	AGENCIA e ADM:\n");
     printf("		4-> abertura\n");
     printf("		5-> fechamento\n");
-    printf("		6-> depósito com falha\n");
 
-    exit(0); }
+    exit(0); }*/
+    
+    
+    if (argc != 3) {
+		printf ("usage: %s server_host\n", argv[0]);
+		fprintf(stderr,"Uso correto: %s perfil operação Valor1 numConta\n",argv[0]);
+		printf("argc=>%d\n",argc);
+		printf("Perfil:\n");
+		printf("	1->caixa\n");
+		printf("	2->agencia\n");
+		printf("	3->adm\n");
+		exit (0);
+	}
 	
 	host = argv[1];
 	
-	printf ("arg123 %s %s %s %s\n",argv[1],argv[2],argv[3], argv[4]);
+	printf ("arg123 %s %s \n",argv[1],argv[2]);
+	
+	int clt;
+	clt = atoi(argv[2]);
+	
+	int op;
+	if(clt == 1){
+		printf("		1-> depósito\n");
+		printf("		2-> saque\n");
+		printf("		3-> saldo\n");
+		printf("Qual opercao deseja realizar? ");
+		scanf("%d", &op);
+	}
+	if(clt == 2){
+		printf("		4-> abertura\n");
+		printf("		5-> fechamento\n");
+		printf("Qual opercao deseja realizar? ");
+		scanf("%d", &op);
+	}
+	if(clt == 3){
+		printf("		4-> abertura\n");
+		printf("		5-> fechamento\n");
+		printf("Qual opercao deseja realizar? ");
+		scanf("%d", &op);
+	}
 	
 	  int x,y,i,id;
 	  int valor,operacao,perfil,assinatura;
 	
 	 /* Recupera os 2 operandos passados como argumento */
-	x = atoi(argv[1]);   y = atoi(argv[2]); id = atoi(argv[5]);	
-	perfil=atoi(argv[2]);
-	operacao=atoi(argv[3]);
-	valor=atoi(argv[4]);
+	//x = atoi(argv[1]);   y = atoi(argv[2]); id = atoi(argv[5]);	
+	//perfil=atoi(argv[2]);
 	
-	if ((perfil==1) && ((operacao < 1) || (operacao >3))) {
+	operacao=op;
+	//valor=atoi(argv[4]);
+	
+	
+	
+	
+	/*if ((perfil==1) && ((operacao < 1) || (operacao >3))) {
 		printf("Operação incompatível com o Perfil de Caixa\n");
 		return(0);
 	}
-	if ((perfil==2 || perfil==3) && ((operacao < 1) || (operacao >6))) {
+	if ((perfil==2 || perfil==3) && ((operacao < 1) || (operacao >5))) {
 		printf("Operação incompatível com o Perfil de Caixa ou ADM\n");
 		return(0);
 	}
 	if (perfil<1 || perfil>3) printf("perfil inexistente!\n");
+	*/
 
 	
+	if(operacao==1){
+		printf("Digite o id da conta: ");
+		scanf("%d", &id);
+		printf("Digite o valor a ser depositado: ");
+		scanf("%d", &valor);
+	}
+	
+	if(operacao==2){
+		printf("Digite o id da conta: ");
+		scanf("%d", &id);
+		printf("Digite o valor a ser sacado: ");
+		scanf("%d", &valor);
+	}
+	
+	if(operacao==3){
+		printf("Digite o id da conta: ");
+		scanf("%d", &id);
+	}
+	
+	if(operacao==4){
+		
+	}
+	
+	if(operacao==5){
+		printf("Digite o id da conta que sera fechada: ");
+		scanf("%d", &id);
+	}
 	
 	rec->id = id;
 	rec->valor = valor;
