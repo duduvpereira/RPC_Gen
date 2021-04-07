@@ -23,12 +23,15 @@ deposito_100_svc(infos *argp, struct svc_req *rqstp)
 	 * insert server code here
 	 */
 	 int i=0;
-	 for(i=0; i<100; i++){
+	 
+	 printf("o id da conta eh: %d\n", argp->id);
+	 printf("o valor eh da conta eh: %d\n", argp->valor);
+	 /*for(i=0; i<100; i++){
 		if(conta[i].id == argp->id){
 			conta[i].valor = conta[i].valor + argp->valor;
 			result = 1;
 		}
-	 }
+	 }*/
 
 	return &result;
 }

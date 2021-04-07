@@ -72,13 +72,25 @@ prog_100(char *host, int operacao, infos *rec)
 			}
 		}
 	}
-
-
-
-	result_1 = deposito_100(&deposito_100_arg, clnt);
-	if (result_1 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
+	
+	else if (operacao==1){
+		if (*result_6==0) printf("A conta id=%d não existe\n",rec->id);
+		else{
+			deposito_100_arg.id = rec->id;
+			deposito_100_arg.valor = rec->valor;
+			deposito_100_arg.num_assinatura = *result_7;
+			result_1 = deposito_100(&deposito_100_arg, clnt);
+			if (result_1 == (int *) NULL) {
+				clnt_perror (clnt, "call failed");
+			} 
+				printf("foi adepositado %d na conta %d \n", rec->valor, rec->id);		
+			
+		}
 	}
+
+
+
+	
 	result_2 = saque_100(&saque_100_arg, clnt);
 	if (result_2 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
