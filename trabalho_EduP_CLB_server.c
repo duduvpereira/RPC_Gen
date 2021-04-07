@@ -8,18 +8,11 @@ int contador_id=0;
 int contaassinatura=0;
 
 
-struct Contas {
-	int numconta;
-	int saldo;
-};
-
 #include "trabalho_EduP_CLB.h"
 
 
 
 struct infos conta[100];
-
-int cont = 0;
 
 int *
 deposito_100_svc(infos *argp, struct svc_req *rqstp)
@@ -30,15 +23,12 @@ deposito_100_svc(infos *argp, struct svc_req *rqstp)
 	 * insert server code here
 	 */
 	 int i=0;
-	 printf("valor: %s\n", argp->valor);
-	 printf("valor: %s\n", argp->id);
-	 //for(i=0; i<100; i++){
-		//if(conta[i].id == argp->id){
-			//printf("valor: %d\n", argp->valor);
-			//conta[i].valor = conta[i].valor + argp->valor;
-			//result = conta[i].valor;
-		//}
-	 //}
+	 for(i=0; i<100; i++){
+		if(conta[i].id == argp->id){
+			conta[i].valor = conta[i].valor + argp->valor;
+			result = 1;
+		}
+	 }
 
 	return &result;
 }
@@ -55,7 +45,7 @@ saque_100_svc(infos *argp, struct svc_req *rqstp)
 	 for(i=0; i<100; i++){
 		if(conta[i].id == argp->id){
 			conta[i].valor = conta[i].valor - argp->valor;
-			result = conta[i].valor;
+			result = 1;
 		}
 	 }
 
@@ -88,9 +78,12 @@ aberturaconta_100_svc(infos *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-	conta[cont].id = cont;
-	result = conta[cont].id ;
-	cont++;
+	 printf("Requisição para abertura de conta\n");
+	 if (argp->num_assinatura == contaassinatura){
+		contador_id++; // começa em '1' (Não queremos conta n '0')
+		conta[contador_id].id = contador_id;
+		result = conta[contador_id].id ;
+	}
 	return &result;
 }
 
@@ -102,11 +95,12 @@ fechamentoconta_100_svc(infos *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-	 int i=0;
-	 for(i=0; i<100; i++){
+	 printf("Requisição para fechamento da conta %d\n",argp->id);
+	 for(int i=0; i<100; i++){
 		if(conta[i].id == argp->id){
-			result = conta[i].id;
-			conta[i].id = -1;
+			conta[i].id = 0;
+			result = 1;
+			break;
 		}
 	 }
 	 
@@ -116,18 +110,21 @@ fechamentoconta_100_svc(infos *argp, struct svc_req *rqstp)
 int *
 autenticaconta_100_svc(infos *argp, struct svc_req *rqstp)
 {
-	static int  result=0;
+	static int  result;
 
+	printf("Requisição para autenticação da conta %d\n",argp->id);	
 	/*
 	 * insert server code here
 	 */
-	 int i=0;
-	 for(i=0; i<100; i++){
+	 result=0;
+	 for(int i=0; i<=contador_id; i++){
+	//	 printf("DEBUG Autentica: i=%d / conta[i].id=%d argp->id=%d\n",i,conta[i].id,argp->id);
 		if(conta[i].id == argp->id){
 			result = 1;
+			break;
 		}
 	 }
-
+	
 	return &result;
 }
 
@@ -139,7 +136,10 @@ retornaproxassinatura_100_svc(void *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-
+	contaassinatura++;
+	result=contaassinatura;
+	printf("Requisição de chave número %d\n",result);
+	
 	return &result;
 }
 

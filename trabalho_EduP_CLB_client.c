@@ -8,7 +8,7 @@
 
 
 void
-prog_100(char *host, int *operacao, infos *rec)
+prog_100(char *host, int operacao, infos *rec)
 {
 	CLIENT *clnt;
 	int  *result_1;
@@ -36,63 +36,60 @@ prog_100(char *host, int *operacao, infos *rec)
 	}
 #endif	/* DEBUG */
 
-	if (operacao==4){
 		result_7 = retornaproxassinatura_100((void*)&retornaproxassinatura_100_arg, clnt);
 		if (result_7 == (int *) NULL) {
 			clnt_perror (clnt, "call failed");
 		}
+		
+		autenticaconta_100_arg.id=rec->id;
+		result_6 = autenticaconta_100(&autenticaconta_100_arg, clnt);
+		if (result_6 == (int *) NULL) {
+			clnt_perror (clnt, "call failed");
+		}
+
+	if (operacao==4){
+		aberturaconta_100_arg.num_assinatura = *result_7;
 		result_4 = aberturaconta_100(&aberturaconta_100_arg, clnt);
 		if (result_4 == (int *) NULL) {
 			clnt_perror (clnt, "call failed");
-		}	
-		printf("a conta de id= %d foi criada\n", *result_4);		
+		} else if (*result_4==0){
+			printf("Não foi possível abrir a conta\n");
+		} else {
+			printf("A conta de id=%d foi criada\n", *result_4);		
+		}
+	} else if (operacao==5){
+		if (*result_6==0) printf("A conta id=%d não existe\n",rec->id);
+		else{
+			fechamentoconta_100_arg.id = rec->id;
+			fechamentoconta_100_arg.num_assinatura = *result_7;
+			result_5 = fechamentoconta_100(&fechamentoconta_100_arg, clnt);
+			if (result_5 == (int *) NULL) {
+				clnt_perror (clnt, "call failed");
+			} else if(*result_5==0){
+				printf("Alerta! A conta de id=%d falhou no fechamento\n", rec->id);		
+			} else {
+				printf("A conta de id=%d foi Fechada\n", rec->id);		
+			}
+		}
 	}
 
-	if (operacao==5){
-		result_7 = retornaproxassinatura_100((void*)&retornaproxassinatura_100_arg, clnt);
-		if (result_7 == (int *) NULL) {
-			clnt_perror (clnt, "call failed");
-		}
-		result_5 = fechamentoconta_100(&fechamentoconta_100_arg, clnt);
-		if (result_5 == (int *) NULL) {
-			clnt_perror (clnt, "call failed");
-		}
-		printf("a conta de id= %d foi fechada\n", *result_5);		
-	}
-	
-	if (operacao==3){
-		result_3 = saldo_100(&saldo_100_arg, clnt);
-		if (result_3 == (int *) NULL) {
-			clnt_perror (clnt, "call failed");
-		}
-		printf("o saldo da conta eh de: %d\n", *result_3);		
-	}
-	
-	if (operacao==2){
-		result_2 = saque_100(&saque_100_arg, clnt);
-		if (result_2 == (int *) NULL) {
-			clnt_perror (clnt, "call failed");
-		}
-		printf("o saldo atual da conta eh de: %d    %d\n", rec->valor, *result_2);		
-	}
-	
-	if (operacao==1){
-		result_1 = deposito_100(&deposito_100_arg, clnt);
-		if (result_1 == (int *) NULL) {
-			clnt_perror (clnt, "call failed");
-		}
-		printf("o saldo atual da conta eh de: %d\n", *result_1);		
-	}
-	
 
 
-	
-	
-	
-	result_6 = autenticaconta_100(&autenticaconta_100_arg, clnt);
-	if (result_6 == (int *) NULL) {
+	result_1 = deposito_100(&deposito_100_arg, clnt);
+	if (result_1 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
+	result_2 = saque_100(&saque_100_arg, clnt);
+	if (result_2 == (int *) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
+	result_3 = saldo_100(&saldo_100_arg, clnt);
+	if (result_3 == (int *) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
+	
+
+
 	
 	result_8 = deposito_comfalha_100(&deposito_comfalha_100_arg, clnt);
 	if (result_8 == (int *) NULL) {
@@ -112,7 +109,7 @@ main (int argc, char *argv[])
 	infos *rec = (infos *) malloc(sizeof(infos));
 	
 
-	/*if (argc!=6) {
+	if (argc!=6) {
     fprintf(stderr,"Uso correto: %s perfil operação Valor1 numConta\n",argv[0]);
     printf("argc=>%d\n",argc);
     printf("Perfil:\n");
@@ -129,65 +126,22 @@ main (int argc, char *argv[])
     printf("		4-> abertura\n");
     printf("		5-> fechamento\n");
 
-    exit(0); }*/
-    
-    
-    if (argc != 3) {
-		printf ("usage: %s server_host\n", argv[0]);
-		fprintf(stderr,"Uso correto: %s perfil operação Valor1 numConta\n",argv[0]);
-		printf("argc=>%d\n",argc);
-		printf("Perfil:\n");
-		printf("	1->caixa\n");
-		printf("	2->agencia\n");
-		printf("	3->adm\n");
-		exit (0);
-	}
-	
+    exit(0); }
 	
 	host = argv[1];
 	
-	printf ("arg123 %s %s \n",argv[1],argv[2]);
-	
-	int clt;
-	clt = atoi(argv[2]);
-	
-	int op;
-	if(clt == 1){
-		printf("		1-> depósito\n");
-		printf("		2-> saque\n");
-		printf("		3-> saldo\n");
-		printf("Qual opercao deseja realizar? ");
-		scanf("%d", &op);
-	}
-	if(clt == 2){
-		printf("		4-> abertura\n");
-		printf("		5-> fechamento\n");
-		printf("Qual opercao deseja realizar? ");
-		scanf("%d", &op);
-	}
-	if(clt == 3){
-		printf("		4-> abertura\n");
-		printf("		5-> fechamento\n");
-		printf("Qual opercao deseja realizar? ");
-		scanf("%d", &op);
-	}
-	
-	
+	printf ("arg123 %s %s %s %s\n",argv[1],argv[2],argv[3], argv[4]);
 	
 	  int x,y,i,id;
 	  int valor,operacao,perfil,assinatura;
 	
 	 /* Recupera os 2 operandos passados como argumento */
-	//x = atoi(argv[1]);   y = atoi(argv[2]); id = atoi(argv[5]);	
-	//perfil=atoi(argv[2]);
+	x = atoi(argv[1]);   y = atoi(argv[2]); id = atoi(argv[5]);	
+	perfil=atoi(argv[2]);
+	operacao=atoi(argv[3]);
+	valor=atoi(argv[4]);
 	
-	operacao=op;
-	//valor=atoi(argv[4]);
-	
-	
-	
-	
-	/*if ((perfil==1) && ((operacao < 1) || (operacao >3))) {
+	if ((perfil==1) && ((operacao < 1) || (operacao >3))) {
 		printf("Operação incompatível com o Perfil de Caixa\n");
 		return(0);
 	}
@@ -196,35 +150,8 @@ main (int argc, char *argv[])
 		return(0);
 	}
 	if (perfil<1 || perfil>3) printf("perfil inexistente!\n");
-	*/
+
 	
-	if(operacao==1){
-		printf("Digite o id da conta: ");
-		scanf("%d", &id);
-		printf("Digite o valor a ser depositado: ");
-		scanf("%d", &valor);
-	}
-	
-	if(operacao==2){
-		printf("Digite o id da conta: ");
-		scanf("%d", &id);
-		printf("Digite o valor a ser sacado: ");
-		scanf("%d", &valor);
-	}
-	
-	if(operacao==3){
-		printf("Digite o id da conta: ");
-		scanf("%d", &id);
-	}
-	
-	if(operacao==4){
-		
-	}
-	
-	if(operacao==5){
-		printf("Digite o id da conta que sera fechada: ");
-		scanf("%d", &id);
-	}
 	
 	rec->id = id;
 	rec->valor = valor;
