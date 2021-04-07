@@ -30,12 +30,15 @@ deposito_100_svc(infos *argp, struct svc_req *rqstp)
 	 * insert server code here
 	 */
 	 int i=0;
-	 for(i=0; i<100; i++){
-		if(conta[i].id == argp->id){
-			conta[i].valor = conta[i].valor + argp->valor;
-			result = 1;
-		}
-	 }
+	 printf("valor: %s\n", argp->valor);
+	 printf("valor: %s\n", argp->id);
+	 //for(i=0; i<100; i++){
+		//if(conta[i].id == argp->id){
+			//printf("valor: %d\n", argp->valor);
+			//conta[i].valor = conta[i].valor + argp->valor;
+			//result = conta[i].valor;
+		//}
+	 //}
 
 	return &result;
 }
@@ -52,7 +55,7 @@ saque_100_svc(infos *argp, struct svc_req *rqstp)
 	 for(i=0; i<100; i++){
 		if(conta[i].id == argp->id){
 			conta[i].valor = conta[i].valor - argp->valor;
-			result = 1;
+			result = conta[i].valor;
 		}
 	 }
 
@@ -102,8 +105,8 @@ fechamentoconta_100_svc(infos *argp, struct svc_req *rqstp)
 	 int i=0;
 	 for(i=0; i<100; i++){
 		if(conta[i].id == argp->id){
+			result = conta[i].id;
 			conta[i].id = -1;
-			result = 1;
 		}
 	 }
 	 
