@@ -73,32 +73,54 @@ prog_100(char *host, int operacao, infos *rec)
 		}
 	}
 	
-	else if (operacao==1){
+	else if (operacao==1 || operacao==6){
 		if (*result_6==0) printf("A conta id=%d não existe\n",rec->id);
 		else{
 			deposito_100_arg.id = rec->id;
 			deposito_100_arg.valor = rec->valor;
 			deposito_100_arg.num_assinatura = *result_7;
+			if (operacao==6) deposito_100_arg.num_assinatura = 0; //caso do depósito com falha
 			result_1 = deposito_100(&deposito_100_arg, clnt);
 			if (result_1 == (int *) NULL) {
 				clnt_perror (clnt, "call failed");
-			} 
-				printf("foi adepositado %d na conta %d \n", rec->valor, rec->id);		
-			
+			} else if (*result_1==0) {
+				printf("Alerta! O deposito de %d na conta %d falhou. \n", rec->valor, rec->id);		
+			}
+			else printf("Foi depositado R$ %d na conta %d \n", rec->valor, rec->id);					
 		}
 	}
 
-
-
+	 else if (operacao==2){
+		if (*result_6==0) printf("A conta id=%d não existe\n",rec->id);
+		else{
+			saque_100_arg.id = rec->id;
+			saque_100_arg.valor = rec->valor;
+			saque_100_arg.num_assinatura = *result_7;
+			result_2 = saque_100(&saque_100_arg, clnt);
+			if (result_2 == (int *) NULL) {
+				clnt_perror (clnt, "call failed");
+			} else if(*result_2==0){
+				printf("Alerta! O saque de R$ %d da conta %d falhou. \n", rec->valor, rec->id);		
+			} else printf("Foi saque de R$ %d na conta %d \n", rec->valor, rec->id);	
+		}
+	}
 	
-	result_2 = saque_100(&saque_100_arg, clnt);
-	if (result_2 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
+	 else if (operacao==3){
+		if (*result_6==0) printf("A conta id=%d não existe\n",rec->id);
+		else{
+			saldo_100_arg.id = rec->id;
+			//saldo_100_arg.valor = rec->valor;
+			//saldo_100_arg.num_assinatura = *result_7;
+			result_3 = saldo_100(&saldo_100_arg, clnt);
+			if (result_3 == (int *) NULL) {
+				clnt_perror (clnt, "call failed");
+			} else printf("A conta %d possui Saldo de R$ %d \n", rec->id,*result_3);	
+		}
 	}
-	result_3 = saldo_100(&saldo_100_arg, clnt);
-	if (result_3 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
+	
+	else printf("Opção Inválida!\n");
+
+
 	
 
 
@@ -137,6 +159,7 @@ main (int argc, char *argv[])
     printf("	AGENCIA e ADM:\n");
     printf("		4-> abertura\n");
     printf("		5-> fechamento\n");
+    printf("		6-> depósito com falha\n");
 
     exit(0); }
 	
@@ -157,7 +180,7 @@ main (int argc, char *argv[])
 		printf("Operação incompatível com o Perfil de Caixa\n");
 		return(0);
 	}
-	if ((perfil==2 || perfil==3) && ((operacao < 1) || (operacao >5))) {
+	if ((perfil==2 || perfil==3) && ((operacao < 1) || (operacao >6))) {
 		printf("Operação incompatível com o Perfil de Caixa ou ADM\n");
 		return(0);
 	}

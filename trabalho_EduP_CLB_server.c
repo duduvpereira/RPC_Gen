@@ -22,16 +22,18 @@ deposito_100_svc(infos *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-	 int i=0;
 	 
-	 printf("o id da conta eh: %d\n", argp->id);
-	 printf("o valor eh da conta eh: %d\n", argp->valor);
-	 /*for(i=0; i<100; i++){
-		if(conta[i].id == argp->id){
-			conta[i].valor = conta[i].valor + argp->valor;
-			result = 1;
-		}
-	 }*/
+	 result = 0;
+	 printf("Requisição de depósito\n");
+	 if (argp->num_assinatura == contaassinatura){
+		 for(int i=0; i<100; i++){
+			if(conta[i].id == argp->id){
+				conta[i].valor = conta[i].valor + argp->valor;
+				result = 1;
+				break;
+			}
+		 }
+	} else printf("Assinatura com falha!");
 
 	return &result;
 }
@@ -39,18 +41,21 @@ deposito_100_svc(infos *argp, struct svc_req *rqstp)
 int *
 saque_100_svc(infos *argp, struct svc_req *rqstp)
 {
-	static int  result=0;
+	static int  result;
 
 	/*
 	 * insert server code here
 	 */
-	 int i=0;
-	 for(i=0; i<100; i++){
-		if(conta[i].id == argp->id){
-			conta[i].valor = conta[i].valor - argp->valor;
-			result = 1;
-		}
-	 }
+	 result=0;
+	 if (argp->num_assinatura == contaassinatura){
+		 for(int i=0; i<100; i++){
+			if(conta[i].id == argp->id){
+				conta[i].valor = conta[i].valor - argp->valor;
+				result = 1;
+				break;
+			}
+		 }
+	 } else printf("Assinatura com falha!");
 
 	return &result;
 }
@@ -63,10 +68,11 @@ saldo_100_svc(infos *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-	 int i=0;
-	 for(i=0; i<100; i++){
+	 result=0;
+	 for(int i=0; i<100; i++){
 		if(conta[i].id == argp->id){
 			result = conta[i].valor;
+			break;
 		}
 	 }
 
@@ -85,8 +91,9 @@ aberturaconta_100_svc(infos *argp, struct svc_req *rqstp)
 	 if (argp->num_assinatura == contaassinatura){
 		contador_id++; // começa em '1' (Não queremos conta n '0')
 		conta[contador_id].id = contador_id;
+		conta[contador_id].valor = 0;
 		result = conta[contador_id].id ;
-	}
+	} else printf("Assinatura com falha!\n");
 	return &result;
 }
 
@@ -99,13 +106,15 @@ fechamentoconta_100_svc(infos *argp, struct svc_req *rqstp)
 	 * insert server code here
 	 */
 	 printf("Requisição para fechamento da conta %d\n",argp->id);
-	 for(int i=0; i<100; i++){
-		if(conta[i].id == argp->id){
-			conta[i].id = 0;
-			result = 1;
-			break;
-		}
-	 }
+	 if (argp->num_assinatura == contaassinatura){
+		 for(int i=0; i<100; i++){
+			if(conta[i].id == argp->id){
+				conta[i].id = 0;
+				result = 1;
+				break;
+			}
+		 }
+	 } else printf("Assinatura com falha!\n");
 	 
 	return &result;
 }
