@@ -5,7 +5,7 @@
  */
 
 int contador_id=0;
-int contaassinatura=0;
+int contaassinatura=0; //contador de assinaturas
 
 
 #include "trabalho_EduP_CLB.h"
@@ -90,6 +90,7 @@ aberturaconta_100_svc(infos *argp, struct svc_req *rqstp)
 	 * 3. O código só é executado se for igual
 	 * */
 	 printf("Requisição para abertura de conta\n");
+	 result=0;
 	 if (argp->num_assinatura == contaassinatura){
 		contador_id++; // começa em '1' (Não queremos conta n '0')
 		conta[contador_id].id = contador_id;
