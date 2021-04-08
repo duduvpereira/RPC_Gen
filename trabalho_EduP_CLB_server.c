@@ -84,9 +84,11 @@ aberturaconta_100_svc(infos *argp, struct svc_req *rqstp)
 {
 	static int  result=0;
 
-	/*
-	 * insert server code here
-	 */
+	/** FUNÇÃO NÂO-IDEMPOTENTE */
+	/* 1. A abertura de conta não pode ser executada mais de uma vez 
+	 * 2. É testado se o valor de "argp->num_assinatura" é igual ao valor do contador GLOBAL de Assinatura "contaassinatura"
+	 * 3. O código só é executado se for igual
+	 * */
 	 printf("Requisição para abertura de conta\n");
 	 if (argp->num_assinatura == contaassinatura){
 		contador_id++; // começa em '1' (Não queremos conta n '0')
@@ -148,10 +150,12 @@ retornaproxassinatura_100_svc(void *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
+	 /** RESPOSTA A REQUISICAO DO CLIENTE **/
 	contaassinatura++;
 	result=contaassinatura;
 	printf("Requisição de chave número %d\n",result);
 	
+	//Responde ao cliente com o próximo valor do Contador
 	return &result;
 }
 

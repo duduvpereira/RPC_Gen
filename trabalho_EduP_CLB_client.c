@@ -36,11 +36,18 @@ prog_100(char *host, int operacao, infos *rec)
 	}
 #endif	/* DEBUG */
 
+		/** ASSINATURA para métodos NÃO-IDEMPOTENTES **/
+		/* 1. O programa Cliente não passa nada como argumento para o servidor.
+		 * 2. O programa Servidor é que retorna o próximo valor do contador de assinaturas (Variável Global do Servidor)
+		 * 3. O Cliente guarda esse valor na variavel result_7
+		 * 4. O Cliente envia junto o valor de result_7 apenas para as funções Não-Idempotentes
+		 * 5. O Servidor confere se o valor passado como parâmetro é igual ao número atual do contador */
 		result_7 = retornaproxassinatura_100((void*)&retornaproxassinatura_100_arg, clnt);
 		if (result_7 == (int *) NULL) {
 			clnt_perror (clnt, "call failed");
 		}
 		
+		/** AUTENTICACAO **/
 		autenticaconta_100_arg.id=rec->id;
 		result_6 = autenticaconta_100(&autenticaconta_100_arg, clnt);
 		if (result_6 == (int *) NULL) {
@@ -84,7 +91,7 @@ prog_100(char *host, int operacao, infos *rec)
 			if (result_1 == (int *) NULL) {
 				clnt_perror (clnt, "call failed");
 			} else if (*result_1==0) {
-				printf("Alerta! O deposito de %d na conta %d falhou. \n", rec->valor, rec->id);		
+				printf("Alerta! O deposito de R$ %d na conta %d falhou. \n", rec->valor, rec->id);		
 			}
 			else printf("Foi depositado R$ %d na conta %d \n", rec->valor, rec->id);					
 		}
@@ -165,7 +172,8 @@ main (int argc, char *argv[])
     
     if (argc != 3) {
 		printf ("usage: %s server_host\n", argv[0]);
-		fprintf(stderr,"Uso correto: %s perfil operação Valor1 numConta\n",argv[0]);
+		//fprintf(stderr,"Uso correto: %s perfil operação Valor1 numConta\n",argv[0]);
+		fprintf(stderr,"Uso correto: %s perfil operação\n",argv[0]);
 		printf("argc=>%d\n",argc);
 		printf("Perfil:\n");
 		printf("	1->caixa\n");
@@ -181,26 +189,22 @@ main (int argc, char *argv[])
 	int clt;
 	clt = atoi(argv[2]);
 	
+
 	int op;
-	if(clt == 1){
+	if(clt>=1 && clt<=3){//operações comuns a todos perfis
 		printf("		1-> depósito\n");
 		printf("		2-> saque\n");
-		printf("		3-> saldo\n");
-		printf("Qual opercao deseja realizar? ");
-		scanf("%d", &op);
+		printf("		3-> saldo\n");	
+		if(clt == 2 || clt==3){
+			printf("		4-> abertura\n");
+			printf("		5-> fechamento\n");
+			printf("		6-> depósito com falha\n");
+		}
+		printf("Qual operação deseja realizar? ");
+		scanf("%d", &op);		
 	}
-	if(clt == 2){
-		printf("		4-> abertura\n");
-		printf("		5-> fechamento\n");
-		printf("Qual opercao deseja realizar? ");
-		scanf("%d", &op);
-	}
-	if(clt == 3){
-		printf("		4-> abertura\n");
-		printf("		5-> fechamento\n");
-		printf("Qual opercao deseja realizar? ");
-		scanf("%d", &op);
-	}
+
+
 	
 	  int x,y,i,id;
 	  int valor,operacao,perfil,assinatura;
@@ -227,7 +231,7 @@ main (int argc, char *argv[])
 	*/
 
 	
-	if(operacao==1){
+	if(operacao==1 || operacao==6){
 		printf("Digite o id da conta: ");
 		scanf("%d", &id);
 		printf("Digite o valor a ser depositado: ");
@@ -247,7 +251,7 @@ main (int argc, char *argv[])
 	}
 	
 	if(operacao==4){
-		
+			//não faz nada pois é criação de conta
 	}
 	
 	if(operacao==5){
